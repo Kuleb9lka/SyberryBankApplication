@@ -11,7 +11,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class NationalBankRateDto {
 
-    private long currId;
+    private long curId;
 
     private Date date;
 

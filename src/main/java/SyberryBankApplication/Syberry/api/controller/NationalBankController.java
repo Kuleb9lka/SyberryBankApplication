@@ -1,8 +1,10 @@
 package SyberryBankApplication.Syberry.api.controller;
 
 
+import SyberryBankApplication.Syberry.api.dto.nbrb.NationalBankRateDto;
 import SyberryBankApplication.Syberry.api.model.NationalBankRate;
 import SyberryBankApplication.Syberry.api.request.NationalBankApi;
+import SyberryBankApplication.Syberry.api.service.NationalBankService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,23 +14,23 @@ import java.util.Date;
 @RequestMapping("/nbrb")
 public class NationalBankController {
 
-    private final NationalBankApi nationalBankApi;
+    private final NationalBankService service;
 
-    public NationalBankController(NationalBankApi nationalBankApi) {
-        this.nationalBankApi = nationalBankApi;
+    public NationalBankController(NationalBankService service) {
+        this.service = service;
     }
 
     @GetMapping("/rate/{currName}")
-    public NationalBankRate getRateByCurrName(@PathVariable String currName){
+    public NationalBankRateDto getRateByCurrName(@PathVariable String currName){
 
-        return nationalBankApi.getReteByCurrName(currName);
+        return service.getRateByCurrName(currName);
     }
 
     @GetMapping("/rate-on-date/{currName}")
-    public NationalBankRate getRateByCurrNameOnDate(@PathVariable String currName,
+    public NationalBankRateDto getRateByCurrNameOnDate(@PathVariable String currName,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date){
 
-        return nationalBankApi.getRateByCurrNameOnDate(currName, date);
+        return service.getRateByCurrNameOnDate(currName, date);
     }
 
 
