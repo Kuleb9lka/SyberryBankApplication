@@ -14,7 +14,7 @@ import java.util.Date;
 public class NationalBankRate {
 
     @JsonProperty("Cur_ID")
-    private long currId;
+    private long curId;
 
     @JsonProperty("Date")
     private Date date;

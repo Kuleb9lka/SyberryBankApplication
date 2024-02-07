@@ -14,7 +14,7 @@ public class NationalBankApi {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public NationalBankRate getReteByCurrName(String currName){
+    public NationalBankRate getRateByCurrName(String currName){
 
         String url = "https://api.nbrb.by/exrates/rates/" + currName + "?parammode=2";
 
