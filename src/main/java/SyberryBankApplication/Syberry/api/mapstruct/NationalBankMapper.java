@@ -11,6 +11,5 @@ public interface NationalBankMapper {
 
     NationalBankMapper INSTANCE = Mappers.getMapper(NationalBankMapper.class);
 
-
     NationalBankRateDto toDto(NationalBankRate rate);
 }
