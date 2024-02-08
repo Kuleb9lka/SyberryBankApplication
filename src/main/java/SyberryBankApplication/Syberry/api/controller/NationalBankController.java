@@ -2,8 +2,6 @@ package SyberryBankApplication.Syberry.api.controller;
 
 
 import SyberryBankApplication.Syberry.api.dto.nbrb.NationalBankRateDto;
-import SyberryBankApplication.Syberry.api.model.NationalBankRate;
-import SyberryBankApplication.Syberry.api.request.NationalBankApi;
 import SyberryBankApplication.Syberry.api.service.NationalBankService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;

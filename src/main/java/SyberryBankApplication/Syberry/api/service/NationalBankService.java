@@ -2,7 +2,7 @@ package SyberryBankApplication.Syberry.api.service;
 
 import SyberryBankApplication.Syberry.api.dto.nbrb.NationalBankRateDto;
 import SyberryBankApplication.Syberry.api.mapstruct.NationalBankMapper;
-import SyberryBankApplication.Syberry.api.model.NationalBankRate;
+import SyberryBankApplication.Syberry.api.model.nbrb.NationalBankRate;
 import SyberryBankApplication.Syberry.api.request.NationalBankApi;
 import org.springframework.stereotype.Service;
 
