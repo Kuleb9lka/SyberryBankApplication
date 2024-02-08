@@ -1,7 +1,7 @@
 package SyberryBankApplication.Syberry.api.request;
 
 
-import SyberryBankApplication.Syberry.api.model.NationalBankRate;
+import SyberryBankApplication.Syberry.api.model.nbrb.NationalBankRate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 

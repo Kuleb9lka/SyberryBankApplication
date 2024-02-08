@@ -2,7 +2,7 @@ package SyberryBankApplication.Syberry.api.mapstruct;
 
 
 import SyberryBankApplication.Syberry.api.dto.nbrb.NationalBankRateDto;
-import SyberryBankApplication.Syberry.api.model.NationalBankRate;
+import SyberryBankApplication.Syberry.api.model.nbrb.NationalBankRate;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

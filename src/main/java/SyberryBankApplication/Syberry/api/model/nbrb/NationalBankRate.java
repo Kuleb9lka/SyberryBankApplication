@@ -1,4 +1,4 @@
-package SyberryBankApplication.Syberry.api.model;
+package SyberryBankApplication.Syberry.api.model.nbrb;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
