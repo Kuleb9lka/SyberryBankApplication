@@ -14,18 +14,23 @@ public class AlphaBankRate {
     @JsonProperty("sellRate")
     private double sellRate;
 
+    @JsonProperty("sellIso")
     private String sellIso;
 
+    @JsonProperty("sellCode")
     private int sellCode;
 
+    @JsonProperty("buyRate")
     private double buyRate;
 
+    @JsonProperty("buyIso")
     private String buyIso;
 
+    @JsonProperty("buyCode")
     private int buyCode;
 
     @JsonProperty("quantity")
-    private long quantity;
+    private int quantity;
 
     @JsonProperty("name")
     private String name;

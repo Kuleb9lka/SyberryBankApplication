@@ -2,12 +2,10 @@ package SyberryBankApplication.Syberry.api.service;
 
 import SyberryBankApplication.Syberry.api.dto.alphabank.AlphaBankRateDto;
 import SyberryBankApplication.Syberry.api.mapstruct.AlphaBankMapper;
-import SyberryBankApplication.Syberry.api.model.alphabank.AlphaBankRate;
 import SyberryBankApplication.Syberry.api.request.AlphaBankApi;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -20,17 +18,13 @@ public class AlphaBankService {
 
     public AlphaBankRateDto getRateByCurrName(String name) throws Exception {
 
-        return getAllCurrencies().stream()
-                .filter(rate -> rate.getName().equals(name))
-                .findFirst()
+        List<AlphaBankRateDto> alphaBankRateDtoList = mapper.toDtoList(api.getAllRates().getRates());
+
+        return alphaBankRateDtoList.stream()
+                .filter(rate -> rate.getName() != null)
+                .filter(rate -> rate.getSellIso().equalsIgnoreCase(name))
+                .findAny()
                 .orElseThrow(() -> new Exception("Incorrect currency type"));
-    }
-
-    private List<AlphaBankRateDto> getAllCurrencies(){
-
-        AlphaBankRate[] allRates = api.getAllRates();
-
-        return Arrays.asList(mapper.toDtoList(allRates));
     }
 
 

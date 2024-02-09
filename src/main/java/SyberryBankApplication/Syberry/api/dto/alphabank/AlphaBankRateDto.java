@@ -12,11 +12,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AlphaBankRateDto {
 
+    private String sellIso;
+
     private double sellRate;
+
+    private double buyRate;
 
     private long quantity;
 
-    private String name;
-
     private String date;
+
+    private String name;
 }
