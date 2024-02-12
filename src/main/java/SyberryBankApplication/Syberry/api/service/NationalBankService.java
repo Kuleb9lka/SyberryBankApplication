@@ -1,37 +1,34 @@
 package SyberryBankApplication.Syberry.api.service;
 
 import SyberryBankApplication.Syberry.api.dto.nbrb.NationalBankRateDto;
-import SyberryBankApplication.Syberry.api.mapstruct.NationalBankMapper;
+import SyberryBankApplication.Syberry.api.mapstruct.ApiMapper;
 import SyberryBankApplication.Syberry.api.model.nbrb.NationalBankRate;
 import SyberryBankApplication.Syberry.api.request.NationalBankApi;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 @Service
+@RequiredArgsConstructor
 public class NationalBankService {
 
-    private final NationalBankMapper mapper;
+    private final ApiMapper mapper;
 
     private final NationalBankApi api;
-
-    public NationalBankService(NationalBankMapper mapper, NationalBankApi api) {
-        this.mapper = mapper;
-        this.api = api;
-    }
 
     public NationalBankRateDto getRateByCurrName(String name){
 
         NationalBankRate reteByCurrName = api.getRateByCurrName(name);
 
-        return mapper.toDto(reteByCurrName);
+        return mapper.toNationalBankRateDto(reteByCurrName);
     }
 
     public NationalBankRateDto getRateByCurrNameOnDate(String name, Date date){
 
         NationalBankRate rateByCurrNameOnDate = api.getRateByCurrNameOnDate(name, date);
 
-        return mapper.toDto(rateByCurrNameOnDate);
+        return mapper.toNationalBankRateDto(rateByCurrNameOnDate);
     }
 
 }
