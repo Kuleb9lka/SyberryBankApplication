@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BelarusBankRate {
+public class BelarusBankRates {
 
     @JsonProperty("USD_in")
     private double usdBuy;
