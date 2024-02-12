@@ -11,9 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BelarusBankRateDto {
 
-    private double usdSell;
+    private String currencyName;
 
-    private double eurSell;
-
-    private double rubSell;
+    private double rate;
 }
