@@ -11,7 +11,7 @@ public class BelarusBankService {
 
     private final BelarusBankApi api;
 
-    private BelarusBankRateDto getRateByCurrName(String name){
+    public BelarusBankRateDto getRateByCurrName(String name){
 
         return api.getRateByCurrName(name);
     }

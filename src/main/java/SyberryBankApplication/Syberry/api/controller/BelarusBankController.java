@@ -1,7 +1,8 @@
 package SyberryBankApplication.Syberry.api.controller;
 
-import SyberryBankApplication.Syberry.api.dto.alphabank.AlphaBankRateDto;
-import SyberryBankApplication.Syberry.api.service.AlphaBankService;
+
+import SyberryBankApplication.Syberry.api.dto.belarusbank.BelarusBankRateDto;
+import SyberryBankApplication.Syberry.api.service.BelarusBankService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/alpha-bank")
+@RequestMapping("/belarus-bank")
 @RequiredArgsConstructor
-public class AlphaBankController {
+public class BelarusBankController {
 
-    private final AlphaBankService service;
+    private final BelarusBankService service;
 
     @GetMapping("/rate/{name}")
-    public AlphaBankRateDto getRateByCurrName(@PathVariable String name) throws Exception {
+    public BelarusBankRateDto getRateByCurrName(@PathVariable String name){
 
         return service.getRateByCurrName(name);
     }
