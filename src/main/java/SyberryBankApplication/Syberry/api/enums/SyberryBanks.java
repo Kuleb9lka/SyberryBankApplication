@@ -3,6 +3,7 @@ package SyberryBankApplication.Syberry.api.enums;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -12,16 +13,20 @@ public enum SyberryBanks {
     ALPHA_BANK ("Альфа-Банк"),
     BELARUS_BANK("БеларусБанк"),
     NATIONAL_BANK("Национальный Банк");
+//    PARITET_BANK("Паритет Банк"),
+//    SBERBANK("Сбербанк");
 
     private final String name;
 
-    private static List<String> allBanks;
-
     public static List<String> getAllBanks(){
 
-        allBanks.add(String.valueOf(ALPHA_BANK));
-        allBanks.add(String.valueOf(BELARUS_BANK));
-        allBanks.add(String.valueOf(NATIONAL_BANK));
+        List<String> allBanks = new ArrayList<>();
+
+        allBanks.add(ALPHA_BANK.getName());
+        allBanks.add(BELARUS_BANK.getName());
+        allBanks.add(NATIONAL_BANK.getName());
+//        allBanks.add(PARITET_BANK.getName());
+//        allBanks.add(SBERBANK.getName());
 
         return allBanks;
     }
