@@ -3,6 +3,10 @@ package SyberryBankApplication.Syberry.bot.service;
 
 import SyberryBankApplication.Syberry.api.constant.Constant;
 import SyberryBankApplication.Syberry.api.enums.SyberryBanks;
+import SyberryBankApplication.Syberry.api.service.AlphaBankService;
+import SyberryBankApplication.Syberry.api.service.BelarusBankService;
+import SyberryBankApplication.Syberry.api.service.NationalBankService;
+import SyberryBankApplication.Syberry.bot.model.UserSteps;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -17,10 +21,20 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class SyberryBankBot extends TelegramLongPollingBot {
+
+    private final AlphaBankService alphaBankService;
+
+    private final BelarusBankService belarusBankService;
+
+    private final NationalBankService nationalBankService;
+
+    private Map<Long, UserSteps> usersActionsMap = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -32,7 +46,10 @@ public class SyberryBankBot extends TelegramLongPollingBot {
         return Constant.BOT_TOKEN;
     }
 
-    public SyberryBankBot() {
+    public SyberryBankBot(AlphaBankService alphaBankService, BelarusBankService belarusBankService, NationalBankService nationalBankService) {
+        this.alphaBankService = alphaBankService;
+        this.belarusBankService = belarusBankService;
+        this.nationalBankService = nationalBankService;
 
         List<BotCommand> botCommandList = new ArrayList<>();
 
@@ -45,6 +62,8 @@ public class SyberryBankBot extends TelegramLongPollingBot {
             System.out.println(e.getMessage());
         }
     }
+
+
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -66,16 +85,51 @@ public class SyberryBankBot extends TelegramLongPollingBot {
             if (message.getText().equals(Constant.START)) {
 
                 initBanksKeyboard(message, SyberryBanks.getAllBanks());
+
+                usersActionsMap.put(message.getChatId(), new UserSteps());
+
+                return;
             }
 
+            if (SyberryBanks.getAllBanks().contains(message.getText())){
+
+                usersActionsMap.put(message.getChatId(), new UserSteps(message.getText()));
+
+                initCurrenciesKeyboard(message);
+
+            } else {
+
+                sendSimpleMessage(message, "Указан неверный банк.");
+
+                initBanksKeyboard(message, SyberryBanks.getAllBanks());
+            }
+
+
         }
-
-
     }
 
     private void initBanksKeyboard(Message message, List<String> buttons){
 
         sendMessage(message, initKeyboard(buttons), "Выберите один из банков");
+    }
+
+    private void initCurrenciesKeyboard(Message message){
+
+        String usersBank = usersActionsMap.get(message.getChatId()).getBankName();
+
+        if (usersBank.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())){
+
+            sendMessage(message, initKeyboard(alphaBankService.getMainCurrencies()), "Alphabank currencies");
+        } else if (usersBank.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())){
+
+            sendMessage(message, initKeyboard(belarusBankService.getMainCurrencies()), "BelarusBank currencies");
+        } else if (usersBank.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())){
+
+            sendMessage(message, initKeyboard(nationalBankService.getMainCurrencies()), "National Bank currencies");
+        } else {
+
+            sendSimpleMessage(message, "Fatal Error");
+        }
     }
 
     private List<KeyboardRow> initKeyboard(List<String> buttons) {
@@ -125,5 +179,18 @@ public class SyberryBankBot extends TelegramLongPollingBot {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    private void sendSimpleMessage(Message message, String text){
+
+        try{
+            execute(SendMessage.builder()
+                    .text(text)
+                    .chatId(message.getChatId())
+                    .build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

@@ -9,12 +9,16 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UserSteps {
 
-    private long chatId;
-
     private String bankName;
 
     private String currencyName;
 
+    public UserSteps(String bankName) {
+        this.bankName = bankName;
+    }
 
-
+    public UserSteps(String bankName, String currencyName) {
+        this.bankName = bankName;
+        this.currencyName = currencyName;
+    }
 }

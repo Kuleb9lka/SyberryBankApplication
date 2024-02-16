@@ -32,6 +32,22 @@ public class NationalBankApi {
         return restTemplate.getForObject(url, NationalBankRate.class);
     }
 
+    public NationalBankRate[] getAllRates(){
+
+        String url = "https://api.nbrb.by/exrates/rates?periodicity=0";
+
+        return restTemplate.getForObject(url, NationalBankRate[].class);
+    }
+
+    public NationalBankRate[] getAllRatesOnDate(Date date){
+
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        String url = "https://api.nbrb.by/exrates/rates?ondate=" + dateFormat.format(date) + "&periodicity=0";
+
+        return restTemplate.getForObject(url, NationalBankRate[].class);
+    }
+
 
 
 }

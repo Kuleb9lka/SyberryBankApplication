@@ -8,6 +8,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/nbrb")
@@ -27,6 +29,25 @@ public class NationalBankController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date){
 
         return service.getRateByCurrNameOnDate(currName, date);
+    }
+
+    @GetMapping("/rates")
+    public List<NationalBankRateDto> getAllRates(){
+
+        return service.getAllRates();
+    }
+
+    @GetMapping("/rates-on-date")
+    public List<NationalBankRateDto> getAllRatesOnDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date date){
+
+        return service.getAllRatesOnDate(date);
+    }
+
+    @GetMapping("/currencies")
+    public List<String> getAllCurrencies(){
+
+        return service.getMainCurrencies();
     }
 
 
