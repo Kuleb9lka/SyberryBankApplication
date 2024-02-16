@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Set;
+
 @RestController
 @RequestMapping("/belarus-bank")
 @RequiredArgsConstructor
@@ -20,5 +23,17 @@ public class BelarusBankController {
     public BelarusBankRateDto getRateByCurrName(@PathVariable String name){
 
         return service.getRateByCurrName(name);
+    }
+
+    @GetMapping("/rates")
+    public List<BelarusBankRateDto> getAllRates(){
+
+        return service.getAllRates();
+    }
+
+    @GetMapping("/currencies")
+    public List<String> getAllCurrencies(){
+
+        return service.getMainCurrencies();
     }
 }

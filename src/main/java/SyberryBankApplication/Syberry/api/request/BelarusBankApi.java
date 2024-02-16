@@ -8,12 +8,14 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
+
 @Component
 public class BelarusBankApi {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private BelarusBankRates[] getAllRates(String city){
+    public BelarusBankRates[] getAllRates(String city){
 
         String url = "https://belarusbank.by/api/kursExchange?city=" + city;
 
