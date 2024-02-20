@@ -22,8 +22,8 @@ public class BelarusBankApi {
         return restTemplate.getForObject(url, BelarusBankRates[].class);
     }
 
-    @SneakyThrows
-    public BelarusBankRateDto getRateByCurrName(String name){
+
+    public BelarusBankRateDto getRateByCurrName(String name) throws Exception {
 
         BelarusBankRates[] allRates = getAllRates(Constant.DEFAULT_BELARUS_BANK_CITY);
 
