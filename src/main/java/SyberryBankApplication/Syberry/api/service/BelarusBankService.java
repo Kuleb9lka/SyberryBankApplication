@@ -18,7 +18,7 @@ public class BelarusBankService {
 
     private final BelarusBankApi api;
 
-    public BelarusBankRateDto getRateByCurrName(String name) throws Exception {
+    public BelarusBankRateDto getRateByCurrName(String name){
 
         return api.getRateByCurrName(name);
     }
