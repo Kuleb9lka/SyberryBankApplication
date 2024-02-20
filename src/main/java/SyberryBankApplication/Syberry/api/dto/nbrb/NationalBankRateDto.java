@@ -17,4 +17,12 @@ public class NationalBankRateDto {
     private String curAbbreviation;
 
     private double curOfficialRate;
+
+
+    @Override
+    public String toString() {
+        return "Наименование валюты: " + curAbbreviation + "\n" +
+                "курс: " + curOfficialRate + "\n" +
+                "дата: " + date;
+    }
 }

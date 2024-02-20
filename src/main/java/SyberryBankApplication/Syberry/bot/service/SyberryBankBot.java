@@ -2,6 +2,8 @@ package SyberryBankApplication.Syberry.bot.service;
 
 
 import SyberryBankApplication.Syberry.api.constant.Constant;
+import SyberryBankApplication.Syberry.api.dto.alphabank.AlphaBankRateDto;
+import SyberryBankApplication.Syberry.api.dto.belarusbank.BelarusBankRateDto;
 import SyberryBankApplication.Syberry.api.enums.SyberryBanks;
 import SyberryBankApplication.Syberry.api.service.AlphaBankService;
 import SyberryBankApplication.Syberry.api.service.BelarusBankService;
@@ -34,7 +36,7 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
     private final NationalBankService nationalBankService;
 
-    private Map<Long, UserSteps> usersActionsMap = new HashMap<>();
+    private Map<Long, UserSteps> usersMap = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -84,38 +86,102 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
             if (message.getText().equals(Constant.START)) {
 
-                initBanksKeyboard(message, SyberryBanks.getAllBanks());
+                initBanksKeyboard(message);
 
-                usersActionsMap.put(message.getChatId(), new UserSteps());
+                usersMap.put(message.getChatId(), new UserSteps());
 
                 return;
             }
 
             if (SyberryBanks.getAllBanks().contains(message.getText())){
 
-                usersActionsMap.put(message.getChatId(), new UserSteps(message.getText()));
+                usersMap.put(message.getChatId(), new UserSteps(message.getText()));
 
                 initCurrenciesKeyboard(message);
 
-            } else {
-
-                sendSimpleMessage(message, "Указан неверный банк.");
-
-                initBanksKeyboard(message, SyberryBanks.getAllBanks());
+                return;
             }
 
+            if (usersMap.get(message.getChatId()).getBankName() == null){
+
+                initBanksKeyboard(message);
+
+                return;
+            }
+
+            if (usersMap.get(message.getChatId()).getCurrencyName() == null){
+
+                String bankName = usersMap.get(message.getChatId()).getBankName();
+
+                UserSteps currentUser = usersMap.get(message.getChatId());
+
+                if (bankName.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())){
+
+                    if (alphaBankService.getMainCurrencies().contains(message.getText())){
+
+                        try {
+                            AlphaBankRateDto rateByCurrName = alphaBankService.getRateByCurrName(message.getText());
+
+                            sendSimpleMessage(message, rateByCurrName.toString());
+
+                            currentUser.setCurrencyName(null);
+                        } catch (Exception e) {
+                            sendSimpleMessage(message, e.getMessage());
+                        }
+                    }
+
+                } else if (bankName.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())){
+
+                    if (belarusBankService.getMainCurrencies().contains(message.getText())){
+
+                        try{
+
+                            BelarusBankRateDto rateByCurrName = belarusBankService.getRateByCurrName(message.getText());
+
+                            sendSimpleMessage(message, rateByCurrName.toString());
+
+                            currentUser.setCurrencyName(null);
+                        } catch (Exception e) {
+
+                            sendSimpleMessage(message, e.getMessage());
+                        }
+                    }
+
+                } else if(bankName.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())){
+
+                    if (nationalBankService.getMainCurrencies().contains(message.getText())){
+
+                        currentUser.setCurrencyName(message.getText());
+
+                        usersMap.put(message.getChatId(), currentUser);
+
+                        initDateKeyboard(message);
+                    }
+                }
+
+            }
 
         }
     }
 
-    private void initBanksKeyboard(Message message, List<String> buttons){
+    private void initDateKeyboard(Message message){
 
-        sendMessage(message, initKeyboard(buttons), "Выберите один из банков");
+        List<String> datesButtons = new ArrayList<>();
+
+        datesButtons.add("На сегодня");
+        datesButtons.add("На другую дату");
+
+        sendMessage(message, initKeyboard(datesButtons), "Выберите дату");
+    }
+
+    private void initBanksKeyboard(Message message){
+
+        sendMessage(message, initKeyboard(SyberryBanks.getAllBanks()), "Выберите один из банков");
     }
 
     private void initCurrenciesKeyboard(Message message){
 
-        String usersBank = usersActionsMap.get(message.getChatId()).getBankName();
+        String usersBank = usersMap.get(message.getChatId()).getBankName();
 
         if (usersBank.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())){
 

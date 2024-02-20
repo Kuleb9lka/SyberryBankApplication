@@ -23,4 +23,12 @@ public class AlphaBankRateDto {
     private String date;
 
     private String name;
+
+    @Override
+    public String toString() {
+        return "Наименование валюты: " + sellIso + "\n" +
+                "курс продажи:" + sellRate + "\n" +
+                "курс покупки: "+ buyRate + "\n" +
+                "дата: " + date;
+    }
 }

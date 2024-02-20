@@ -14,4 +14,10 @@ public class BelarusBankRateDto {
     private String currencyName;
 
     private double rate;
+
+    @Override
+    public String toString() {
+        return "Наименование валюты: " + currencyName + "\n" +
+                "курс: " + rate;
+    }
 }
