@@ -2,6 +2,7 @@ package SyberryBankApplication.Syberry.api.dto.nbrb;
 
 import lombok.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Getter
@@ -19,10 +20,12 @@ public class NationalBankRateDto {
     private double curOfficialRate;
 
 
+    @SneakyThrows
     @Override
     public String toString() {
+
         return "Наименование валюты: " + curAbbreviation + "\n" +
                 "курс: " + curOfficialRate + "\n" +
-                "дата: " + date;
+                "дата: " + new SimpleDateFormat("dd-MM-yyyy").format(date);
     }
 }

@@ -4,11 +4,13 @@ package SyberryBankApplication.Syberry.bot.service;
 import SyberryBankApplication.Syberry.api.constant.Constant;
 import SyberryBankApplication.Syberry.api.dto.alphabank.AlphaBankRateDto;
 import SyberryBankApplication.Syberry.api.dto.belarusbank.BelarusBankRateDto;
+import SyberryBankApplication.Syberry.api.dto.nbrb.NationalBankRateDto;
 import SyberryBankApplication.Syberry.api.enums.SyberryBanks;
 import SyberryBankApplication.Syberry.api.service.AlphaBankService;
 import SyberryBankApplication.Syberry.api.service.BelarusBankService;
 import SyberryBankApplication.Syberry.api.service.NationalBankService;
 import SyberryBankApplication.Syberry.bot.model.UserSteps;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
@@ -22,10 +24,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class SyberryBankBot extends TelegramLongPollingBot {
@@ -36,7 +38,7 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
     private final NationalBankService nationalBankService;
 
-    private Map<Long, UserSteps> usersMap = new HashMap<>();
+    private final Map<Long, UserSteps> usersMap = new HashMap<>();
 
     @Override
     public String getBotUsername() {
@@ -80,7 +82,10 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
     }
 
+    @SneakyThrows
     private void messageHandler(Message message) {
+
+        UserSteps currentUser = usersMap.get(message.getChatId());
 
         if (message.hasText()) {
 
@@ -91,6 +96,33 @@ public class SyberryBankBot extends TelegramLongPollingBot {
                 usersMap.put(message.getChatId(), new UserSteps());
 
                 return;
+            }
+
+            if (message.getText().equalsIgnoreCase("На сегодня") && currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())) {
+
+                NationalBankRateDto rateByCurrName = nationalBankService.getRateByCurrName(currentUser.getCurrencyName());
+
+                sendSimpleMessage(message, rateByCurrName.toString());
+            }
+
+            if (message.getText().equals("На другую дату")){
+
+                sendSimpleMessage(message, "Введите дату в формате ддММгггг");
+            }
+
+            Matcher matcher = Pattern.compile("[\\d{8}]").matcher(message.getText());
+
+            if (matcher.find()){
+
+                SimpleDateFormat format = new SimpleDateFormat("ddMMyyyy");
+                Date date = format.parse(message.getText());
+
+                if (currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())){
+
+                    NationalBankRateDto rateByCurrNameOnDate = nationalBankService.getRateByCurrNameOnDate(currentUser.getCurrencyName(), date);
+
+                    sendSimpleMessage(message, rateByCurrNameOnDate.toString());
+                }
             }
 
             if (SyberryBanks.getAllBanks().contains(message.getText())){
@@ -111,40 +143,20 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
             if (usersMap.get(message.getChatId()).getCurrencyName() == null){
 
-                String bankName = usersMap.get(message.getChatId()).getBankName();
-
-                UserSteps currentUser = usersMap.get(message.getChatId());
+                String bankName = currentUser.getBankName();
 
                 if (bankName.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())){
 
                     if (alphaBankService.getMainCurrencies().contains(message.getText())){
 
-                        try {
-                            AlphaBankRateDto rateByCurrName = alphaBankService.getRateByCurrName(message.getText());
-
-                            sendSimpleMessage(message, rateByCurrName.toString());
-
-                            currentUser.setCurrencyName(null);
-                        } catch (Exception e) {
-                            sendSimpleMessage(message, e.getMessage());
-                        }
+                        showAlphaBankRate(message, currentUser);
                     }
 
                 } else if (bankName.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())){
 
                     if (belarusBankService.getMainCurrencies().contains(message.getText())){
 
-                        try{
-
-                            BelarusBankRateDto rateByCurrName = belarusBankService.getRateByCurrName(message.getText());
-
-                            sendSimpleMessage(message, rateByCurrName.toString());
-
-                            currentUser.setCurrencyName(null);
-                        } catch (Exception e) {
-
-                            sendSimpleMessage(message, e.getMessage());
-                        }
+                        showBelarusBankRate(message, currentUser);
                     }
 
                 } else if(bankName.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())){
@@ -157,10 +169,37 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
                         initDateKeyboard(message);
                     }
+
                 }
-
             }
+        }
+    }
 
+    private void showBelarusBankRate(Message message,  UserSteps currentUser){
+
+        try{
+
+            BelarusBankRateDto rateByCurrName = belarusBankService.getRateByCurrName(message.getText());
+
+            sendSimpleMessage(message, rateByCurrName.toString());
+
+            currentUser.setCurrencyName(null);
+        } catch (Exception e) {
+
+            sendSimpleMessage(message, e.getMessage());
+        }
+    }
+
+    private void showAlphaBankRate(Message message, UserSteps currentUser){
+
+        try {
+            AlphaBankRateDto rateByCurrName = alphaBankService.getRateByCurrName(message.getText());
+
+            sendSimpleMessage(message, rateByCurrName.toString());
+
+            currentUser.setCurrencyName(null);
+        } catch (Exception e) {
+            sendSimpleMessage(message, e.getMessage());
         }
     }
 
@@ -257,6 +296,5 @@ public class SyberryBankBot extends TelegramLongPollingBot {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
     }
 }
