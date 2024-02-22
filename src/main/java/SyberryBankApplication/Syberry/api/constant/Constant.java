@@ -16,6 +16,10 @@ public final class Constant {
 
     public static final String START = "/start";
 
+    public static final String BACK = "Назад";
+
+
+
 
 }
 
