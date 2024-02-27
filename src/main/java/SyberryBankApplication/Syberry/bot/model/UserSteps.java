@@ -13,7 +13,7 @@ public class UserSteps {
 
     private String currencyName;
 
-    private boolean isOnDateChosen;
+    private int stepsCounter;
 
     public UserSteps(String bankName) {
         this.bankName = bankName;
@@ -24,9 +24,9 @@ public class UserSteps {
         this.currencyName = currencyName;
     }
 
-    public UserSteps(String bankName, String currencyName, boolean isOnDateChosen) {
+    public UserSteps(String bankName, String currencyName, int stepsCounter) {
         this.bankName = bankName;
         this.currencyName = currencyName;
-        this.isOnDateChosen = isOnDateChosen;
+        this.stepsCounter = stepsCounter;
     }
 }

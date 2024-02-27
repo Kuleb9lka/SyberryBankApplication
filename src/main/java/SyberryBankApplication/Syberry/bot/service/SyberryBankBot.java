@@ -68,7 +68,6 @@ public class SyberryBankBot extends TelegramLongPollingBot {
     }
 
 
-
     @Override
     public void onUpdateReceived(Update update) {
 
@@ -78,14 +77,10 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
             messageHandler(message);
         }
-
-
     }
 
     @SneakyThrows
     private void messageHandler(Message message) {
-
-        UserSteps currentUser = usersMap.get(message.getChatId());
 
         if (message.hasText()) {
 
@@ -98,26 +93,71 @@ public class SyberryBankBot extends TelegramLongPollingBot {
                 return;
             }
 
-            if (message.getText().equalsIgnoreCase("На сегодня") && currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())) {
+            UserSteps currentUser = usersMap.get(message.getChatId());
+
+            if (SyberryBanks.getAllBanks().contains(message.getText())) {
+
+                currentUser.setBankName(message.getText());
+
+                currentUser.setStepsCounter(1);
+
+                initCurrenciesKeyboard(message);
+
+                return;
+            }
+
+            if (currentUser.getStepsCounter() == 1) {
+
+                String bankName = currentUser.getBankName();
+
+                if (bankName.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())) {
+
+                    if (alphaBankService.getMainCurrencies().contains(message.getText())) {
+
+                        showAlphaBankRate(message);
+                    }
+
+                } else if (bankName.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())) {
+
+                    if (belarusBankService.getMainCurrencies().contains(message.getText())) {
+
+                        showBelarusBankRate(message);
+                    }
+
+                } else if (bankName.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())) {
+
+                    if (nationalBankService.getMainCurrencies().contains(message.getText())) {
+
+                        currentUser.setCurrencyName(message.getText());
+
+                        initDateKeyboard(message);
+
+                        currentUser.setStepsCounter(2);
+                    }
+                }
+            }
+
+            if (message.getText().equalsIgnoreCase(Constant.ON_TODAY) && currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())) {
 
                 NationalBankRateDto rateByCurrName = nationalBankService.getRateByCurrName(currentUser.getCurrencyName());
 
                 sendSimpleMessage(message, rateByCurrName.toString());
             }
 
-            if (message.getText().equals("На другую дату")){
+            if (message.getText().equals(Constant.ON_OTHER_DAY)) {
 
                 sendSimpleMessage(message, "Введите дату в формате ддММгггг");
             }
 
             Matcher matcher = Pattern.compile("[\\d{8}]").matcher(message.getText());
 
-            if (matcher.find()){
+            if (matcher.find()) {
 
                 SimpleDateFormat format = new SimpleDateFormat("ddMMyyyy");
+
                 Date date = format.parse(message.getText());
 
-                if (currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())){
+                if (currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())) {
 
                     NationalBankRateDto rateByCurrNameOnDate = nationalBankService.getRateByCurrNameOnDate(currentUser.getCurrencyName(), date);
 
@@ -125,115 +165,81 @@ public class SyberryBankBot extends TelegramLongPollingBot {
                 }
             }
 
-            if (SyberryBanks.getAllBanks().contains(message.getText())){
+            if (message.getText().equals(Constant.BACK)) {
 
-                usersMap.put(message.getChatId(), new UserSteps(message.getText()));
+                if (currentUser.getStepsCounter() == 0){
 
-                initCurrenciesKeyboard(message);
+                    initBanksKeyboard(message);
+                } else if (currentUser.getStepsCounter() == 1){
 
-                return;
-            }
+                    initBanksKeyboard(message);
 
-            if (usersMap.get(message.getChatId()).getBankName() == null){
+                    currentUser.setStepsCounter(0);
+                } else if(currentUser.getStepsCounter() == 2){
 
-                initBanksKeyboard(message);
+                    initCurrenciesKeyboard(message);
 
-                return;
-            }
-
-            if (usersMap.get(message.getChatId()).getCurrencyName() == null){
-
-                String bankName = currentUser.getBankName();
-
-                if (bankName.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())){
-
-                    if (alphaBankService.getMainCurrencies().contains(message.getText())){
-
-                        showAlphaBankRate(message, currentUser);
-                    }
-
-                } else if (bankName.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())){
-
-                    if (belarusBankService.getMainCurrencies().contains(message.getText())){
-
-                        showBelarusBankRate(message, currentUser);
-                    }
-
-                } else if(bankName.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())){
-
-                    if (nationalBankService.getMainCurrencies().contains(message.getText())){
-
-                        currentUser.setCurrencyName(message.getText());
-
-                        usersMap.put(message.getChatId(), currentUser);
-
-                        initDateKeyboard(message);
-                    }
-
+                    currentUser.setStepsCounter(1);
                 }
             }
         }
     }
 
-    private void showBelarusBankRate(Message message,  UserSteps currentUser){
+    private void showBelarusBankRate(Message message) {
 
-        try{
+        try {
 
             BelarusBankRateDto rateByCurrName = belarusBankService.getRateByCurrName(message.getText());
 
             sendSimpleMessage(message, rateByCurrName.toString());
-
-            currentUser.setCurrencyName(null);
         } catch (Exception e) {
 
             sendSimpleMessage(message, e.getMessage());
         }
     }
 
-    private void showAlphaBankRate(Message message, UserSteps currentUser){
+    private void showAlphaBankRate(Message message) {
 
         try {
             AlphaBankRateDto rateByCurrName = alphaBankService.getRateByCurrName(message.getText());
 
             sendSimpleMessage(message, rateByCurrName.toString());
-
-            currentUser.setCurrencyName(null);
         } catch (Exception e) {
             sendSimpleMessage(message, e.getMessage());
         }
     }
 
-    private void initDateKeyboard(Message message){
+    private void initDateKeyboard(Message message) {
 
         List<String> datesButtons = new ArrayList<>();
 
-        datesButtons.add("На сегодня");
-        datesButtons.add("На другую дату");
+        datesButtons.add(Constant.ON_TODAY);
+        datesButtons.add(Constant.ON_OTHER_DAY);
 
         sendMessage(message, initKeyboard(datesButtons), "Выберите дату");
     }
 
-    private void initBanksKeyboard(Message message){
+    private void initBanksKeyboard(Message message) {
 
         sendMessage(message, initKeyboard(SyberryBanks.getAllBanks()), "Выберите один из банков");
     }
 
-    private void initCurrenciesKeyboard(Message message){
+    private void initCurrenciesKeyboard(Message message) {
 
         String usersBank = usersMap.get(message.getChatId()).getBankName();
 
-        if (usersBank.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())){
+        if (usersBank.equalsIgnoreCase(SyberryBanks.ALPHA_BANK.getName())) {
 
-            sendMessage(message, initKeyboard(alphaBankService.getMainCurrencies()), "Alphabank currencies");
-        } else if (usersBank.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())){
+            sendMessage(message, initKeyboard(alphaBankService.getMainCurrencies()), "Валюты Альфа-Банка");
+        } else if (usersBank.equalsIgnoreCase(SyberryBanks.BELARUS_BANK.getName())) {
 
-            sendMessage(message, initKeyboard(belarusBankService.getMainCurrencies()), "BelarusBank currencies");
-        } else if (usersBank.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())){
+            sendMessage(message, initKeyboard(belarusBankService.getMainCurrencies()), "Валюты Беларусбанка");
+        } else if (usersBank.equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.getName())) {
 
-            sendMessage(message, initKeyboard(nationalBankService.getMainCurrencies()), "National Bank currencies");
+            sendMessage(message, initKeyboard(nationalBankService.getMainCurrencies()), "Валюты Нацонального Банка РБ");
         } else {
 
-            sendSimpleMessage(message, "Fatal Error");
+            sendSimpleMessage(message, "Введене неверная информация");
         }
     }
 
@@ -247,7 +253,7 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
             for (int i = 0; i < buttons.size(); i++) {
 
-                if (i % 2 == 0){
+                if (i % 2 == 0) {
 
                     keyboardRows.add(row);
 
@@ -265,14 +271,16 @@ public class SyberryBankBot extends TelegramLongPollingBot {
             }
         }
 
+        row.add(new KeyboardButton(Constant.BACK));
+
         keyboardRows.add(row);
 
         return keyboardRows;
     }
 
-    private void sendMessage(Message message, List<KeyboardRow> rows, String text){
+    private void sendMessage(Message message, List<KeyboardRow> rows, String text) {
 
-        try{
+        try {
             execute(SendMessage.builder()
                     .text(text)
                     .replyMarkup(ReplyKeyboardMarkup.builder()
@@ -286,9 +294,9 @@ public class SyberryBankBot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendSimpleMessage(Message message, String text){
+    private void sendSimpleMessage(Message message, String text) {
 
-        try{
+        try {
             execute(SendMessage.builder()
                     .text(text)
                     .chatId(message.getChatId())
