@@ -18,6 +18,10 @@ public final class Constant {
 
     public static final String BACK = "Назад";
 
+    public static final String ON_TODAY = "На сегодня";
+
+    public static final String ON_OTHER_DAY = "На другую дату";
+
 
 
 
