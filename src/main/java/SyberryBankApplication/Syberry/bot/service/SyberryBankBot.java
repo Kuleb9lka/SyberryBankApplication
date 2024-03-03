@@ -137,17 +137,9 @@ public class SyberryBankBot extends TelegramLongPollingBot {
                 }
             }
 
-            if (message.getText().equalsIgnoreCase(Constant.ON_TODAY) && currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.getName())) {
+            isOnToday(message, currentUser);
 
-                NationalBankRateDto rateByCurrName = nationalBankService.getRateByCurrName(currentUser.getCurrencyName());
-
-                sendSimpleMessage(message, rateByCurrName.toString());
-            }
-
-            if (message.getText().equals(Constant.ON_OTHER_DAY)) {
-
-                sendSimpleMessage(message, "Введите дату в формате ддММгггг");
-            }
+            isOnOtherDay(message, currentUser);
 
             Matcher matcher = Pattern.compile("[\\d{8}]").matcher(message.getText());
 
@@ -181,6 +173,31 @@ public class SyberryBankBot extends TelegramLongPollingBot {
 
                     currentUser.setStepsCounter(1);
                 }
+            }
+        }
+    }
+
+    private void isOnToday(Message message, UserSteps currentUser){
+
+        if (message.getText().equalsIgnoreCase(Constant.ON_TODAY)) {
+
+            if (currentUser.getBankName().equals(SyberryBanks.NATIONAL_BANK.name())){
+
+                NationalBankRateDto rateByCurrName = nationalBankService.getRateByCurrName(currentUser.getCurrencyName());
+
+                sendSimpleMessage(message, rateByCurrName.toString());
+            }
+
+        }
+    }
+
+    private void isOnOtherDay(Message message, UserSteps currentUser){
+
+        if (message.getText().equalsIgnoreCase(Constant.ON_OTHER_DAY)){
+
+            if (currentUser.getBankName().equalsIgnoreCase(SyberryBanks.NATIONAL_BANK.name())){
+
+                sendSimpleMessage(message, "Введите дату в формате ддММгггг");
             }
         }
     }
