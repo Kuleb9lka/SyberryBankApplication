@@ -13,8 +13,6 @@ public enum SyberryBanks {
     ALPHA_BANK ("Альфа-Банк"),
     BELARUS_BANK("БеларусБанк"),
     NATIONAL_BANK("Национальный Банк");
-//    PARITET_BANK("Паритет Банк"),
-//    SBERBANK("Сбербанк");
 
     private final String name;
 
@@ -25,8 +23,6 @@ public enum SyberryBanks {
         allBanks.add(ALPHA_BANK.getName());
         allBanks.add(BELARUS_BANK.getName());
         allBanks.add(NATIONAL_BANK.getName());
-//        allBanks.add(PARITET_BANK.getName());
-//        allBanks.add(SBERBANK.getName());
 
         return allBanks;
     }
